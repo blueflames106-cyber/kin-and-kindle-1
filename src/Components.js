@@ -446,7 +446,7 @@ export function ProductCard({
 
 
       <p className="product-price">
-        R
+        ₹
         {Number(
           product.price || 0
         ).toFixed(2)}
