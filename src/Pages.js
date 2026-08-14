@@ -627,7 +627,7 @@ export function LandingPage() {
                   </h4>
 
                   <p>
-                    R
+                    ₹
                     {product.price.toFixed(
                       2
                     )}
@@ -808,7 +808,6 @@ export function LandingPage() {
   );
 }
 
-
 /* =========================================================
    STAR RATING
    ========================================================= */
@@ -838,7 +837,6 @@ function StarRating({
     </div>
   );
 }
-
 
 /* =========================================================
    STORE PAGE
@@ -953,7 +951,7 @@ export function StorePage({
                     </p>
 
                     <p className="product-price">
-                      R
+                      ₹
                       {product.price.toFixed(
                         2
                       )}
@@ -1027,7 +1025,6 @@ export function StorePage({
     </div>
   );
 }
-
 
 /* =========================================================
    CART DRAWER
@@ -1157,7 +1154,7 @@ export function CartDrawer({
                       </h6>
 
                       <p className="mb-1">
-                        R
+                        ₹
                         {product.price.toFixed(
                           2
                         )}
@@ -1323,7 +1320,7 @@ export function CartDrawer({
                 </span>
 
                 <span>
-                  R
+                  ₹
                   {total.toFixed(
                     2
                   )}
@@ -1352,7 +1349,6 @@ export function CartDrawer({
     </div>
   );
 }
-
 
 /* =========================================================
    WISHLIST DRAWER
@@ -1438,7 +1434,7 @@ export function WishlistDrawer({
                   </h6>
 
                   <p className="mb-1">
-                    R
+                    ₹
                     {item.price.toFixed(
                       2
                     )}
@@ -1484,7 +1480,6 @@ export function WishlistDrawer({
     </div>
   );
 }
-
 
 /* =========================================================
    EXPORTS
