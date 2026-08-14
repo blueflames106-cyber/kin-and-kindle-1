@@ -1,25 +1,10 @@
 import React, { useState } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useLocation,
-} from "react-router-dom";
 
 import {
   CartProvider,
   WishlistProvider,
   useCart,
-  useWishlist,
 } from "./Store";
-
-import {
-  Header,
-  SearchBar,
-  PromoBanner,
-  Footer,
-  LoginRegisterModal,
-} from "./Components";
 
 import {
   LandingPage,
@@ -28,180 +13,246 @@ import {
   WishlistDrawer,
 } from "./Pages";
 
+import {
+  Header,
+  Footer,
+} from "./Components";
+
+
 /* =========================================================
-   MAIN APPLICATION CONTENT
+   MAIN APPLICATION
    ========================================================= */
 
 function AppContent() {
-  const location = useLocation();
+
+  const [page, setPage] =
+    useState("home");
+
+  const [
+    searchQuery,
+    setSearchQuery,
+  ] = useState("");
+
+  const [
+    selectedCategory,
+    setSelectedCategory,
+  ] = useState("All");
+
+  const [
+    cartOpen,
+    setCartOpen,
+  ] = useState(false);
+
+  const [
+    wishlistOpen,
+    setWishlistOpen,
+  ] = useState(false);
+
 
   const {
     cartItems,
     addToCart,
     removeFromCart,
     updateQty,
+    moveToWishlist,
   } = useCart();
 
-  const {
-    wishlistItems,
-    addToWishlist,
-  } = useWishlist();
 
-  /* -------------------------
-     UI STATE
-     ------------------------- */
+  /* -------------------------------------------------------
+     NAVIGATION
+     ------------------------------------------------------- */
 
-  const [cartOpen, setCartOpen] = useState(false);
-  const [wishlistOpen, setWishlistOpen] = useState(false);
+  const goHome = () => {
+    setPage("home");
+    window.scrollTo(0, 0);
+  };
 
-  const [showModal, setShowModal] = useState(false);
-  const [isLogin, setIsLogin] = useState(true);
+  const goStore = () => {
+    setPage("store");
+    window.scrollTo(0, 0);
+  };
 
-  const [currentUser, setCurrentUser] = useState(null);
 
-  /* -------------------------
-     SEARCH STATE
-     ------------------------- */
+  /* -------------------------------------------------------
+     SEARCH
+     ------------------------------------------------------- */
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] =
-    useState("All");
-
-  /* -------------------------
-     ROUTE-SPECIFIC UI
-     ------------------------- */
-
-  const hiddenRoutes = ["/cart"];
-
-  const shouldHideBanner =
-    hiddenRoutes.includes(location.pathname);
-
-  /* -------------------------
-     SEARCH HANDLERS
-     ------------------------- */
-
-  const handleSearch = (query, category) => {
+  const handleSearch = (query) => {
     setSearchQuery(query);
-    setSelectedCategory(category);
+    setPage("store");
   };
 
-  const handleCategoryChange = (category, query) => {
-    setSelectedCategory(category);
-    setSearchQuery(query);
+
+  /* -------------------------------------------------------
+     CATEGORY
+     ------------------------------------------------------- */
+
+  const handleCategoryChange =
+    (category) => {
+      setSelectedCategory(
+        category
+      );
+
+      setPage("store");
+    };
+
+
+  /* -------------------------------------------------------
+     CART
+     ------------------------------------------------------- */
+
+  const openCart = () => {
+    setCartOpen(true);
+    setWishlistOpen(false);
   };
 
-  /* -------------------------
-     LOGIN / LOGOUT
-     ------------------------- */
-
-  const handleLogout = () => {
-    setCurrentUser(null);
+  const closeCart = () => {
+    setCartOpen(false);
   };
 
-  /* -------------------------
-     CART → WISHLIST
-     ------------------------- */
 
-  const handleMoveToWishlist = (productId) => {
-    const item = cartItems.find(
-      (cartItem) =>
-        cartItem.product.id === productId
+  /* -------------------------------------------------------
+     WISHLIST
+     ------------------------------------------------------- */
+
+  const openWishlist = () => {
+    setWishlistOpen(true);
+    setCartOpen(false);
+  };
+
+  const closeWishlist = () => {
+    setWishlistOpen(false);
+  };
+
+
+  /* -------------------------------------------------------
+     PAGE CONTENT
+     ------------------------------------------------------- */
+
+  let pageContent;
+
+  if (page === "store") {
+
+    pageContent = (
+      <StorePage
+        searchQuery={
+          searchQuery
+        }
+        selectedCategory={
+          selectedCategory
+        }
+        addToCart={
+          addToCart
+        }
+      />
     );
 
-    if (!item) {
-      return;
-    }
+  } else {
 
-    addToWishlist(item.product);
-    removeFromCart(productId);
-  };
+    pageContent = (
+      <LandingPage />
+    );
+
+  }
+
 
   return (
-    <>
+    <div className="app">
+
+      {/* =================================================
+          HEADER
+          ================================================= */}
+
       <Header
-        onCartClick={() => setCartOpen(true)}
-        onWishlistClick={() => setWishlistOpen(true)}
-        cartCount={cartItems.length}
-        wishlistCount={wishlistItems.length}
-        currentUser={currentUser}
-        onLoginClick={() => setShowModal(true)}
-        onLogoutClick={handleLogout}
+        onHome={goHome}
+        onStore={goStore}
+        onSearch={
+          handleSearch
+        }
+        onCategoryChange={
+          handleCategoryChange
+        }
+        onCart={openCart}
+        onWishlist={
+          openWishlist
+        }
       />
 
-      {location.pathname === "/store" && (
-        <SearchBar
-          onSearch={handleSearch}
-          onCategoryChange={handleCategoryChange}
-        />
-      )}
 
-      {!shouldHideBanner && <PromoBanner />}
+      {/* =================================================
+          MAIN PAGE
+          ================================================= */}
 
       <main>
-        <Routes>
-          <Route
-            path="/"
-            element={<LandingPage />}
-          />
-
-          <Route
-            path="/store"
-            element={
-              <StorePage
-                addToCart={addToCart}
-                searchQuery={searchQuery}
-                selectedCategory={selectedCategory}
-              />
-            }
-          />
-        </Routes>
+        {pageContent}
       </main>
 
-      <CartDrawer
-        isOpen={cartOpen}
-        onClose={() => setCartOpen(false)}
-        cartItems={cartItems}
-        onRemoveItem={removeFromCart}
-        onUpdateQty={updateQty}
-        onMoveToWishlist={handleMoveToWishlist}
-      />
 
-      <WishlistDrawer
-        isOpen={wishlistOpen}
-        onClose={() => setWishlistOpen(false)}
-      />
+      {/* =================================================
+          FOOTER
+          ================================================= */}
 
       <Footer />
 
-      {showModal && (
-        <LoginRegisterModal
-          isLogin={isLogin}
-          onClose={() => setShowModal(false)}
-          switchForm={() =>
-            setIsLogin((previous) => !previous)
-          }
-          onLoginSuccess={(username) => {
-            setCurrentUser(username);
-            setShowModal(false);
-          }}
-        />
-      )}
-    </>
+
+      {/* =================================================
+          CART DRAWER
+          ================================================= */}
+
+      <CartDrawer
+        isOpen={cartOpen}
+        onClose={closeCart}
+        cartItems={
+          cartItems
+        }
+        onRemoveItem={
+          removeFromCart
+        }
+        onUpdateQty={
+          updateQty
+        }
+        onMoveToWishlist={
+          moveToWishlist
+        }
+      />
+
+
+      {/* =================================================
+          WISHLIST DRAWER
+          ================================================= */}
+
+      <WishlistDrawer
+        isOpen={
+          wishlistOpen
+        }
+        onClose={
+          closeWishlist
+        }
+      />
+
+    </div>
   );
 }
+
 
 /* =========================================================
-   APPLICATION ROOT
+   ROOT PROVIDERS
    ========================================================= */
 
-export default function App() {
+function App() {
+
   return (
-    <Router>
-      <CartProvider>
-        <WishlistProvider>
-          <AppContent />
-        </WishlistProvider>
-      </CartProvider>
-    </Router>
+    <CartProvider>
+
+      <WishlistProvider>
+
+        <AppContent />
+
+      </WishlistProvider>
+
+    </CartProvider>
   );
 }
+
+
+export default App;
