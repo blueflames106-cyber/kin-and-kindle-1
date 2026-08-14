@@ -1,921 +1,251 @@
-# Components.js
+import React, { useState } from "react";
 
-```javascript
-import React, { useEffect, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
-import {
-  FaHome,
-  FaStore,
-  FaShoppingCart,
-  FaUser,
-  FaSignOutAlt,
-  FaHeart,
-  FaSearch,
-  FaEye,
-  FaEyeSlash,
-  FaInstagram,
-  FaFacebookF,
-  FaTiktok,
-  FaGithub,
-} from "react-icons/fa";
-
-import logo from "./assets/brandname.png";
 
 /* =========================================================
    HEADER
    ========================================================= */
 
 export function Header({
-  currentUser,
-  onLogoutClick,
-  onLoginClick,
-  onCartClick,
-  onWishlistClick,
-  cartCount = 0,
-  wishlistCount = 0,
-}) {
-  const activateWithKeyboard = (event, callback) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      callback();
-    }
-  };
-
-  return (
-    <header className="header">
-      <nav className="navbar">
-
-        <NavLink
-          to="/"
-          className="logo-link"
-          aria-label="Lumina Home"
-        >
-          <img
-            src={logo}
-            alt="Lumina Logo"
-            className="logo"
-          />
-        </NavLink>
-
-        <ul className="nav-links">
-
-          <li className="nav-icon" data-tooltip="Home">
-            <NavLink
-              to="/"
-              className={({ isActive }) =>
-                isActive
-                  ? "icon-btn active"
-                  : "icon-btn"
-              }
-              aria-label="Home"
-            >
-              <FaHome aria-hidden="true" />
-            </NavLink>
-          </li>
-
-          <li className="nav-icon" data-tooltip="Store">
-            <NavLink
-              to="/store"
-              className={({ isActive }) =>
-                isActive
-                  ? "icon-btn active"
-                  : "icon-btn"
-              }
-              aria-label="Store"
-            >
-              <FaStore aria-hidden="true" />
-            </NavLink>
-          </li>
-
-          <li
-            className="nav-icon"
-            data-tooltip="Wishlist"
-            role="button"
-            tabIndex={0}
-            onClick={onWishlistClick}
-            onKeyDown={(event) =>
-              activateWithKeyboard(
-                event,
-                onWishlistClick
-              )
-            }
-            aria-label={`Open wishlist with ${wishlistCount} items`}
-          >
-            <div
-              style={{
-                position: "relative",
-              }}
-            >
-              <FaHeart
-                className="icon-btn"
-                aria-hidden="true"
-              />
-
-              {wishlistCount > 0 && (
-                <span className="wishlist-badge">
-                  {wishlistCount}
-                </span>
-              )}
-            </div>
-          </li>
-
-          <li
-            className="nav-icon"
-            data-tooltip="Cart"
-            role="button"
-            tabIndex={0}
-            onClick={onCartClick}
-            onKeyDown={(event) =>
-              activateWithKeyboard(
-                event,
-                onCartClick
-              )
-            }
-            aria-label={`Shopping cart with ${cartCount} items`}
-          >
-            <div
-              style={{
-                position: "relative",
-              }}
-            >
-              <FaShoppingCart
-                className="icon-btn"
-                aria-hidden="true"
-              />
-
-              {cartCount > 0 && (
-                <span className="cart-badge">
-                  {cartCount}
-                </span>
-              )}
-            </div>
-          </li>
-
-          <li
-            className="nav-icon"
-            data-tooltip={
-              currentUser ? "Logout" : "Login"
-            }
-          >
-            {currentUser ? (
-              <div className="welcome-user">
-                Welcome,{" "}
-                <span className="username">
-                  {currentUser}
-                </span>
-
-                <button
-                  type="button"
-                  onClick={onLogoutClick}
-                  className="logout-btn"
-                  aria-label="Logout"
-                >
-                  <FaSignOutAlt />
-                </button>
-              </div>
-            ) : (
-              <FaUser
-                className="icon-btn"
-                onClick={onLoginClick}
-                style={{
-                  cursor: "pointer",
-                }}
-                aria-label="Login"
-              />
-            )}
-          </li>
-
-        </ul>
-      </nav>
-    </header>
-  );
-}
-
-
-/* =========================================================
-   SEARCH BAR
-   ========================================================= */
-
-const SEARCH_CATEGORIES = [
-  "All",
-  "Bestsellers",
-  "Signature Collection",
-  "Newest Arrivals",
-];
-
-export function SearchBar({
+  onHome,
+  onStore,
   onSearch,
   onCategoryChange,
+  onCart,
+  onWishlist,
 }) {
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("All");
 
-  const updateSearch = (value) => {
-    setQuery(value);
+  const [
+    searchOpen,
+    setSearchOpen,
+  ] = useState(false);
 
-    if (typeof onSearch === "function") {
-      onSearch(value, category);
-    }
-  };
-
-  const updateCategory = (value) => {
-    setCategory(value);
-
-    if (
-      typeof onCategoryChange === "function"
-    ) {
-      onCategoryChange(value, query);
-    }
-  };
-
-  const clearSearch = () => {
-    setQuery("");
-
-    if (typeof onSearch === "function") {
-      onSearch("", category);
-    }
-  };
-
-  return (
-    <div className="search-bar-wrapper">
-      <div className="search-bar-container">
-
-        <select
-          value={category}
-          onChange={(event) =>
-            updateCategory(event.target.value)
-          }
-          className="category-select"
-          aria-label="Product category"
-        >
-          {SEARCH_CATEGORIES.map((item) => (
-            <option key={item} value={item}>
-              {item}
-            </option>
-          ))}
-        </select>
-
-        <div className="search-input-wrapper">
-          <input
-            type="search"
-            placeholder="Search products..."
-            value={query}
-            onChange={(event) =>
-              updateSearch(event.target.value)
-            }
-            className="search-input"
-            aria-label="Search products"
-          />
-
-          {query && (
-            <button
-              type="button"
-              onClick={clearSearch}
-              className="clear-button"
-              aria-label="Clear search"
-            >
-              &times;
-            </button>
-          )}
-        </div>
-
-        <button
-          type="button"
-          className="search-icon-button"
-          aria-label="Search"
-        >
-          <FaSearch />
-        </button>
-
-      </div>
-    </div>
-  );
-}
+  const [
+    searchValue,
+    setSearchValue,
+  ] = useState("");
 
 
-/* =========================================================
-   PROMOTIONAL BANNER
-   ========================================================= */
+  /* -------------------------------------------------------
+     SEARCH
+     ------------------------------------------------------- */
 
-export function PromoBanner() {
-  const navigate = useNavigate();
+  const submitSearch = (
+    event
+  ) => {
 
-  const openStore = () => {
-    navigate("/store");
-  };
-
-  return (
-    <div className="promo-banner">
-      <div className="promo-content">
-
-        <h1 className="promo-title">
-          FLAMING HOT SALE
-        </h1>
-
-        <h2 className="promo-subtitle">
-          50% off Selected Items
-        </h2>
-
-        <p className="promo-message">
-          While stocks last!
-        </p>
-
-        <p className="promo-footer">
-          Online * T&C’s apply
-        </p>
-
-        <button
-          type="button"
-          className="promo-btn"
-          onClick={openStore}
-        >
-          Shop Now
-        </button>
-
-      </div>
-    </div>
-  );
-}
-
-
-/* =========================================================
-   LOGIN / REGISTER MODAL
-   ========================================================= */
-
-export function LoginRegisterModal({
-  isLogin,
-  onClose,
-  switchForm,
-  onLoginSuccess,
-}) {
-  const [registration, setRegistration] =
-    useState({
-      firstName: "",
-      surname: "",
-      username: "",
-      email: "",
-      password: "",
-    });
-
-  const [confirmPassword, setConfirmPassword] =
-    useState("");
-
-  const [errors, setErrors] = useState({});
-
-  const [loginIdentity, setLoginIdentity] =
-    useState("");
-
-  const [loginPassword, setLoginPassword] =
-    useState("");
-
-  const [rememberMe, setRememberMe] =
-    useState(false);
-
-  const [loginError, setLoginError] =
-    useState("");
-
-  const [showRegistrationPassword, setShowRegistrationPassword] =
-    useState(false);
-
-  const [showLoginPassword, setShowLoginPassword] =
-    useState(false);
-
-  useEffect(() => {
-    try {
-      const saved = JSON.parse(
-        localStorage.getItem(
-          "rememberedLogin"
-        )
-      );
-
-      if (saved) {
-        setLoginIdentity(
-          saved.usernameOrEmail || ""
-        );
-        setLoginPassword(
-          saved.password || ""
-        );
-        setRememberMe(true);
-      }
-    } catch {
-      localStorage.removeItem(
-        "rememberedLogin"
-      );
-    }
-  }, []);
-
-  const validateEmail = (email) =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-      email
-    );
-
-  const validatePassword = (password) =>
-    /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/.test(
-      password
-    );
-
-  const updateRegistration = (event) => {
-    const {
-      name,
-      value,
-    } = event.target;
-
-    setRegistration((previous) => ({
-      ...previous,
-      [name]: value,
-    }));
-  };
-
-  const registerUser = (event) => {
     event.preventDefault();
 
-    const nextErrors = {};
-
-    const data = {
-      firstName:
-        registration.firstName.trim(),
-      surname:
-        registration.surname.trim(),
-      username:
-        registration.username.trim(),
-      email:
-        registration.email.trim(),
-      password:
-        registration.password.trim(),
-    };
-
-    if (!data.firstName) {
-      nextErrors.firstName =
-        "First name required";
-    }
-
-    if (!data.surname) {
-      nextErrors.surname =
-        "Surname required";
-    }
-
-    if (!data.username) {
-      nextErrors.username =
-        "Username required";
-    }
-
-    if (!validateEmail(data.email)) {
-      nextErrors.email =
-        "Invalid email";
-    }
-
-    if (!validatePassword(data.password)) {
-      nextErrors.password =
-        "Password must be 8+ characters, include a capital letter and number";
-    }
-
     if (
-      data.password !==
-      confirmPassword
+      typeof onSearch ===
+      "function"
     ) {
-      nextErrors.confirmPassword =
-        "Passwords do not match";
+      onSearch(searchValue);
     }
-
-    if (
-      Object.keys(nextErrors).length
-    ) {
-      setErrors(nextErrors);
-      return;
-    }
-
-    let users = [];
-
-    try {
-      users =
-        JSON.parse(
-          localStorage.getItem("users")
-        ) || [];
-    } catch {
-      users = [];
-    }
-
-    const duplicate = users.some(
-      (user) =>
-        user.username ===
-          data.username ||
-        user.email === data.email
-    );
-
-    if (duplicate) {
-      alert(
-        "User already exists with this email or username."
-      );
-      return;
-    }
-
-    const updatedUsers = [
-      ...users,
-      data,
-    ];
-
-    localStorage.setItem(
-      "users",
-      JSON.stringify(updatedUsers)
-    );
-
-    alert(
-      `Registered successfully as ${data.username}`
-    );
-
-    onLoginSuccess(data.username);
-    onClose();
   };
 
-  const loginUser = (event) => {
-    event.preventDefault();
 
-    setLoginError("");
+  /* -------------------------------------------------------
+     CATEGORY
+     ------------------------------------------------------- */
+
+  const selectCategory = (
+    event
+  ) => {
+
+    const category =
+      event.target.value;
 
     if (
-      !loginIdentity.trim() ||
-      !loginPassword.trim()
+      typeof onCategoryChange ===
+      "function"
     ) {
-      setLoginError(
-        "Please fill in both fields"
-      );
-      return;
-    }
-
-    let users = [];
-
-    try {
-      users =
-        JSON.parse(
-          localStorage.getItem("users")
-        ) || [];
-    } catch {
-      users = [];
-    }
-
-    const matchedUser = users.find(
-      (user) =>
-        (
-          user.username ===
-            loginIdentity ||
-          user.email === loginIdentity
-        ) &&
-        user.password === loginPassword
-    );
-
-    if (!matchedUser) {
-      setLoginError(
-        "Invalid email/username or password"
-      );
-      return;
-    }
-
-    if (rememberMe) {
-      localStorage.setItem(
-        "rememberedLogin",
-        JSON.stringify({
-          usernameOrEmail:
-            loginIdentity,
-          password:
-            loginPassword,
-        })
-      );
-    } else {
-      localStorage.removeItem(
-        "rememberedLogin"
+      onCategoryChange(
+        category
       );
     }
-
-    onLoginSuccess(
-      matchedUser.username
-    );
-
-    onClose();
   };
 
-  const handleOverlayClick = (event) => {
-    if (
-      event.target === event.currentTarget
-    ) {
-      onClose();
-    }
-  };
 
   return (
-    <div
-      className="modal-overlay"
-      onClick={handleOverlayClick}
-    >
-      <div
-        className="modal-content"
-        onClick={(event) =>
-          event.stopPropagation()
-        }
-      >
+    <header className="navbar">
+
+      <div className="navbar-container">
+
+        {/* =================================================
+            LOGO
+            ================================================= */}
 
         <button
+          className="logo"
+          onClick={onHome}
           type="button"
-          className="modal-close"
-          onClick={onClose}
-          aria-label="Close"
         >
-          &times;
+          Kin & Kindle
         </button>
 
-        <h2>
-          {isLogin
-            ? "Login to Lumina"
-            : "Register for Lumina"}
-        </h2>
 
-        <form
-          onSubmit={
-            isLogin
-              ? loginUser
-              : registerUser
-          }
-        >
+        {/* =================================================
+            NAVIGATION
+            ================================================= */}
 
-          {!isLogin && (
-            <>
-              <label>
-                First Name
-                <input
-                  type="text"
-                  name="firstName"
-                  value={
-                    registration.firstName
-                  }
-                  onChange={
-                    updateRegistration
-                  }
-                  required
-                />
-                {errors.firstName && (
-                  <small className="error">
-                    {errors.firstName}
-                  </small>
-                )}
-              </label>
+        <nav>
 
-              <label>
-                Surname
-                <input
-                  type="text"
-                  name="surname"
-                  value={
-                    registration.surname
-                  }
-                  onChange={
-                    updateRegistration
-                  }
-                  required
-                />
-                {errors.surname && (
-                  <small className="error">
-                    {errors.surname}
-                  </small>
-                )}
-              </label>
+          <ul className="nav-links">
 
-              <label>
-                Username
-                <input
-                  type="text"
-                  name="username"
-                  value={
-                    registration.username
-                  }
-                  onChange={
-                    updateRegistration
-                  }
-                  required
-                />
-                {errors.username && (
-                  <small className="error">
-                    {errors.username}
-                  </small>
-                )}
-              </label>
+            <li>
+              <button
+                type="button"
+                onClick={onHome}
+                className="nav-link-button"
+              >
+                Home
+              </button>
+            </li>
 
-              <label>
-                Email
-                <input
-                  type="email"
-                  name="email"
-                  value={
-                    registration.email
-                  }
-                  onChange={
-                    updateRegistration
-                  }
-                  required
-                />
-                {errors.email && (
-                  <small className="error">
-                    {errors.email}
-                  </small>
-                )}
-              </label>
+            <li>
+              <button
+                type="button"
+                onClick={onStore}
+                className="nav-link-button"
+              >
+                Store
+              </button>
+            </li>
 
-              <label>
-                Password
+            <li>
 
-                <div className="password-wrapper">
-                  <input
-                    type={
-                      showRegistrationPassword
-                        ? "text"
-                        : "password"
-                    }
-                    name="password"
-                    value={
-                      registration.password
-                    }
-                    onChange={
-                      updateRegistration
-                    }
-                    required
-                  />
+              <select
+                className="category-select"
+                defaultValue="All"
+                onChange={
+                  selectCategory
+                }
+              >
 
-                  <button
-                    type="button"
-                    className="eye-icon"
-                    onClick={() =>
-                      setShowRegistrationPassword(
-                        (value) => !value
-                      )
-                    }
-                    aria-label={
-                      showRegistrationPassword
-                        ? "Hide password"
-                        : "Show password"
-                    }
-                  >
-                    {showRegistrationPassword ? (
-                      <FaEyeSlash />
-                    ) : (
-                      <FaEye />
-                    )}
-                  </button>
-                </div>
+                <option value="All">
+                  All Products
+                </option>
 
-                {errors.password && (
-                  <small className="error">
-                    {errors.password}
-                  </small>
-                )}
-              </label>
+                <option value="Signature Collection">
+                  Signature Collection
+                </option>
 
-              <label>
-                Confirm Password
+                <option value="Bestsellers">
+                  Bestsellers
+                </option>
 
-                <input
-                  type={
-                    showRegistrationPassword
-                      ? "text"
-                      : "password"
-                  }
-                  value={
-                    confirmPassword
-                  }
-                  onChange={(event) =>
-                    setConfirmPassword(
-                      event.target.value
-                    )
-                  }
-                  required
-                />
+                <option value="Newest Arrivals">
+                  Newest Arrivals
+                </option>
 
-                {errors.confirmPassword && (
-                  <small className="error">
-                    {
-                      errors.confirmPassword
-                    }
-                  </small>
-                )}
-              </label>
-            </>
-          )}
+              </select>
 
-          {isLogin && (
-            <>
-              <label>
-                Email or Username
+            </li>
 
-                <input
-                  type="text"
-                  value={loginIdentity}
-                  onChange={(event) =>
-                    setLoginIdentity(
-                      event.target.value
-                    )
-                  }
-                  required
-                />
-              </label>
+          </ul>
 
-              <label>
-                Password
+        </nav>
 
-                <div className="password-wrapper">
-                  <input
-                    type={
-                      showLoginPassword
-                        ? "text"
-                        : "password"
-                    }
-                    value={loginPassword}
-                    onChange={(event) =>
-                      setLoginPassword(
-                        event.target.value
-                      )
-                    }
-                    required
-                  />
 
-                  <button
-                    type="button"
-                    className="eye-icon"
-                    onClick={() =>
-                      setShowLoginPassword(
-                        (value) => !value
-                      )
-                    }
-                    aria-label={
-                      showLoginPassword
-                        ? "Hide password"
-                        : "Show password"
-                    }
-                  >
-                    {showLoginPassword ? (
-                      <FaEyeSlash />
-                    ) : (
-                      <FaEye />
-                    )}
-                  </button>
-                </div>
-              </label>
+        {/* =================================================
+            ACTIONS
+            ================================================= */}
 
-              <label className="remember-me">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={() =>
-                    setRememberMe(
-                      (value) => !value
-                    )
-                  }
-                />
-                Remember me
-              </label>
+        <div className="nav-actions">
 
-              {loginError && (
-                <small className="error">
-                  {loginError}
-                </small>
-              )}
-            </>
-          )}
+          {/* SEARCH */}
 
           <button
-            type="submit"
-            className="submit-btn"
+            type="button"
+            className="nav-icon-button"
+            onClick={() =>
+              setSearchOpen(
+                (value) =>
+                  !value
+              )
+            }
+            aria-label="Search"
           >
-            {isLogin
-              ? "Sign in"
-              : "Register"}
+            🔍
           </button>
-        </form>
 
-        <div className="switch-form">
-          {isLogin ? (
-            <>
-              No online profile?{" "}
-              <button
-                type="button"
-                onClick={switchForm}
-                className="switch-btn"
-              >
-                Register
-              </button>
-            </>
-          ) : (
-            <>
-              Already have an account?{" "}
-              <button
-                type="button"
-                onClick={switchForm}
-                className="switch-btn"
-              >
-                Login
-              </button>
-            </>
-          )}
+
+          {/* WISHLIST */}
+
+          <button
+            type="button"
+            className="nav-icon-button"
+            onClick={
+              onWishlist
+            }
+            aria-label="Wishlist"
+          >
+            ♡
+          </button>
+
+
+          {/* CART */}
+
+          <button
+            type="button"
+            className="nav-icon-button"
+            onClick={
+              onCart
+            }
+            aria-label="Cart"
+          >
+            🛒
+          </button>
+
         </div>
 
       </div>
-    </div>
+
+
+      {/* =================================================
+          SEARCH BAR
+          ================================================= */}
+
+      {searchOpen && (
+
+        <div className="header-search">
+
+          <form
+            onSubmit={
+              submitSearch
+            }
+          >
+
+            <input
+              type="search"
+              value={
+                searchValue
+              }
+              onChange={(
+                event
+              ) =>
+                setSearchValue(
+                  event.target
+                    .value
+                )
+              }
+              placeholder="Search products..."
+              autoFocus
+            />
+
+            <button
+              type="submit"
+            >
+              Search
+            </button>
+
+          </form>
+
+        </div>
+
+      )}
+
+    </header>
   );
 }
 
@@ -925,158 +255,296 @@ export function LoginRegisterModal({
    ========================================================= */
 
 export function Footer() {
-  const stopFormSubmission = (event) => {
-    event.preventDefault();
-  };
 
   return (
-    <footer className="footer">
+    <footer>
 
       <div className="footer-container">
 
-        <div className="footer-section brand">
-          <h4 className="brand-name">
-            Lumina
+        {/* =================================================
+            BRAND
+            ================================================= */}
+
+        <div>
+
+          <h4>
+            Kin & Kindle
           </h4>
 
-          <p className="brand-description">
-            Where elegance meets aroma.
-            Handcrafted candles made to calm,
-            captivate, and create mood.
+          <p>
+            Handcrafted candles
+            created to bring warmth,
+            comfort and character
+            into everyday spaces.
           </p>
+
         </div>
 
-        <div className="footer-section links">
-          <h5>Quick Links</h5>
 
-          <ul>
-            <li>
-              <a
-                href="/"
-                className="footer-link"
-              >
-                Home
-              </a>
-            </li>
+        {/* =================================================
+            QUICK LINKS
+            ================================================= */}
 
-            <li>
-              <a
-                href="/store"
-                className="footer-link"
-              >
-                Shop
-              </a>
-            </li>
+        <div>
 
-            <li>
-              <a
-                href="/contact"
-                className="footer-link"
-              >
-                Contact
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <div className="footer-section newsletter">
-
-          <h5>Stay in Touch</h5>
+          <h4>
+            Quick Links
+          </h4>
 
           <p>
-            Be the first to know about new
-            collections and special offers.
+            <a href="/">
+              Home
+            </a>
           </p>
 
-          <form
-            className="newsletter-form"
-            onSubmit={
-              stopFormSubmission
-            }
-            aria-label="Subscribe to newsletter"
-          >
-            <input
-              type="email"
-              placeholder="Your email"
-              className="newsletter-input"
-              required
-              aria-required="true"
-            />
-
-            <button
-              type="submit"
-              className="btn-subscribe"
-            >
-              Subscribe
-            </button>
-          </form>
-
-          <div
-            className="social-icons"
-            role="list"
-          >
-            <a
-              href="https://instagram.com"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Instagram"
-              className="social-link"
-              role="listitem"
-            >
-              <FaInstagram />
+          <p>
+            <a href="/store">
+              Store
             </a>
+          </p>
 
-            <a
-              href="https://facebook.com"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Facebook"
-              className="social-link"
-              role="listitem"
-            >
-              <FaFacebookF />
+          <p>
+            <a href="/about">
+              About Us
             </a>
+          </p>
 
-            <a
-              href="https://tiktok.com"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="TikTok"
-              className="social-link"
-              role="listitem"
-            >
-              <FaTiktok />
-            </a>
-          </div>
+        </div>
+
+
+        {/* =================================================
+            CONTACT
+            ================================================= */}
+
+        <div>
+
+          <h4>
+            Contact
+          </h4>
+
+          <p>
+            Email:
+            hello@kinandkindle.com
+          </p>
+
+          <p>
+            Follow us on social
+            media for new releases
+            and announcements.
+          </p>
+
         </div>
 
       </div>
 
+
+      {/* =================================================
+          COPYRIGHT
+          ================================================= */}
+
       <div className="footer-bottom">
 
-        <p>
-          © 2025 Lumina. All rights reserved.
-        </p>
-
-        <p>
-          Developed by Chante Schnetler
-        </p>
-
-        <a
-          href="https://github.com/Zu3ty"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="GitHub Profile"
-          className="github-link"
-        >
-          <FaGithub />
-          <span>GitHub</span>
-        </a>
+        ©{" "}
+        {new Date().getFullYear()}
+        {" "}
+        Kin & Kindle. All
+        rights reserved.
 
       </div>
 
     </footer>
   );
 }
-```
 
+
+/* =========================================================
+   SIMPLE PRODUCT CARD
+   ========================================================= */
+
+export function ProductCard({
+  product,
+  onAddToCart,
+  onWishlist,
+  wishlisted = false,
+}) {
+
+  if (!product) {
+    return null;
+  }
+
+  return (
+    <article className="product-card">
+
+      <button
+        type="button"
+        className={`wishlist-btn ${
+          wishlisted
+            ? "active"
+            : ""
+        }`}
+        onClick={() =>
+          onWishlist &&
+          onWishlist(product)
+        }
+        aria-label={
+          wishlisted
+            ? "Remove from wishlist"
+            : "Add to wishlist"
+        }
+      >
+        {wishlisted
+          ? "♥"
+          : "♡"}
+      </button>
+
+
+      <img
+        src={product.image}
+        alt={product.name}
+        className="product-image"
+      />
+
+
+      <h4>
+        {product.name}
+      </h4>
+
+
+      {product.rating !==
+        undefined && (
+
+        <div className="star-rating">
+
+          {[1, 2, 3, 4, 5].map(
+            (star) => (
+
+              <span
+                key={star}
+                className={
+                  star <=
+                  product.rating
+                    ? "star filled"
+                    : "star"
+                }
+              >
+                ★
+              </span>
+
+            )
+          )}
+
+        </div>
+
+      )}
+
+
+      {product.description && (
+        <p className="product-description">
+          {product.description}
+        </p>
+      )}
+
+
+      <p className="product-price">
+        R
+        {Number(
+          product.price || 0
+        ).toFixed(2)}
+      </p>
+
+
+      <button
+        type="button"
+        className="add-to-cart-btn"
+        disabled={
+          product.stock === 0
+        }
+        onClick={() =>
+          onAddToCart &&
+          onAddToCart(product)
+        }
+      >
+        {product.stock === 0
+          ? "Out of Stock"
+          : "Add to Cart"}
+      </button>
+
+    </article>
+  );
+}
+
+
+/* =========================================================
+   CATEGORY BUTTON
+   ========================================================= */
+
+export function CategoryButton({
+  name,
+  active = false,
+  onClick,
+}) {
+
+  return (
+    <button
+      type="button"
+      className={`category-button ${
+        active
+          ? "active"
+          : ""
+      }`}
+      onClick={() =>
+        onClick &&
+        onClick(name)
+      }
+    >
+      {name}
+    </button>
+  );
+}
+
+
+/* =========================================================
+   LOADING COMPONENT
+   ========================================================= */
+
+export function Loading() {
+
+  return (
+    <div className="loading-container">
+
+      <div className="loading-spinner" />
+
+      <p>
+        Loading...
+      </p>
+
+    </div>
+  );
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+export function EmptyState({
+  title = "Nothing here yet",
+  message = "",
+}) {
+
+  return (
+    <div className="empty-state">
+
+      <h3>
+        {title}
+      </h3>
+
+      {message && (
+        <p>
+          {message}
+        </p>
+      )}
+
+    </div>
+  );
+}
