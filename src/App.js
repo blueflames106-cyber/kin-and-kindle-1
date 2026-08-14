@@ -4,6 +4,7 @@ import {
   CartProvider,
   WishlistProvider,
   useCart,
+  useWishlist,
 } from "./Store";
 
 import {
@@ -49,13 +50,55 @@ function AppContent() {
   ] = useState(false);
 
 
+  /* -------------------------------------------------------
+     CART
+     ------------------------------------------------------- */
+
   const {
     cartItems,
     addToCart,
     removeFromCart,
     updateQty,
-    moveToWishlist,
   } = useCart();
+
+
+  /* -------------------------------------------------------
+     WISHLIST
+     ------------------------------------------------------- */
+
+  const {
+    addToWishlist,
+  } = useWishlist();
+
+
+  /* -------------------------------------------------------
+     MOVE CART ITEM TO WISHLIST
+     ------------------------------------------------------- */
+
+  const moveToWishlist = (
+    productId
+  ) => {
+
+    const item =
+      cartItems.find(
+        (cartItem) =>
+          cartItem.product &&
+          cartItem.product.id ===
+            productId
+      );
+
+    if (!item) {
+      return;
+    }
+
+    addToWishlist(
+      item.product
+    );
+
+    removeFromCart(
+      productId
+    );
+  };
 
 
   /* -------------------------------------------------------
@@ -67,6 +110,7 @@ function AppContent() {
     window.scrollTo(0, 0);
   };
 
+
   const goStore = () => {
     setPage("store");
     window.scrollTo(0, 0);
@@ -77,7 +121,10 @@ function AppContent() {
      SEARCH
      ------------------------------------------------------- */
 
-  const handleSearch = (query) => {
+  const handleSearch = (
+    query
+  ) => {
+
     setSearchQuery(query);
     setPage("store");
   };
@@ -89,6 +136,7 @@ function AppContent() {
 
   const handleCategoryChange =
     (category) => {
+
       setSelectedCategory(
         category
       );
@@ -106,6 +154,7 @@ function AppContent() {
     setWishlistOpen(false);
   };
 
+
   const closeCart = () => {
     setCartOpen(false);
   };
@@ -119,6 +168,7 @@ function AppContent() {
     setWishlistOpen(true);
     setCartOpen(false);
   };
+
 
   const closeWishlist = () => {
     setWishlistOpen(false);
@@ -155,6 +205,10 @@ function AppContent() {
 
   }
 
+
+  /* -------------------------------------------------------
+     APPLICATION
+     ------------------------------------------------------- */
 
   return (
     <div className="app">
@@ -254,5 +308,9 @@ function App() {
   );
 }
 
+
+/* =========================================================
+   EXPORT
+   ========================================================= */
 
 export default App;
